@@ -1,25 +1,55 @@
 import React,{useState} from 'react'
+import Header from './components/Header';
 import "./App.css"
-function App() {
-  const [count,setCount] = useState(0);
-  let color = (count >0) ? "green" : (count <0) ? "red" : "black";
+import TaskList from './components/TaskList';
+import AddTaskForm from './AddTaskForm';
 
-  const increment = () => setCount(count+1)
-  const decrement = () => setCount(count-1)
-  const resetCount = () => setCount(0)
+
+function App() {
+  const [tasks, setTasks] = useState([
+    {id:"task_1", title:"Learn JS",status: 0},
+    {id:"task_2", title:"Code a Todo List",status: 0},
+  ]);
+  const [showIncomplete, setShowIncomplete] = useState(true);
+  const [newTask, setNewTask] = useState("");
+
+  const handleSubmit = (e) =>{
+    e.preventDefault();
+    if(newTask) {
+      const task = {
+        id: Date.now(),
+        title: newTask,
+        status:0
+      }
+      setTasks([...tasks, task]);
+      setNewTask("");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setNewTask(e.target.value);
+  }
+
+  const setTaskStatus = (taskId, status) => {
+    setTasks(tasks.map((task) =>{
+      if(task.id === taskId) {
+        return {...task,status: status? 1:0};
+      }
+      return task;
+    })
+  );
+  };
+  const removeTask = (taskId) =>{
+    setTasks(tasks.filter((task) => task.id !==taskId));
+  }
+
   return (
-    <div>
-      <div className='container'>
-        <h1>Counter</h1>
-        <span style={{color}} id="value">{count}</span>
-        <div className="btn-group">
-            <button onClick={decrement} className='btn btn-decrease'>DECREASE</button>
-            <button onClick={resetCount} className='btn btn-reset'>RESET</button>
-            <button onClick={increment} className='btn btn-increase'>INCREASE</button>
-        </div>
+    <div className="container">
+      <Header />
+      <TaskList tasks = {tasks}  showIncomplete={showIncomplete}  setTaskStatus = {setTaskStatus}  removeTask = {removeTask} setShowIncomplete={setShowIncomplete} />
+      <AddTaskForm newTask={newTask} handleSubmit={handleSubmit} handleInputChange= {handleInputChange} />
       </div>
-    </div>
-  )
+  );
 }
 
 export default App
